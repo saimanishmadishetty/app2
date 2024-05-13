@@ -1,0 +1,38 @@
+apiVersion: serving.knative.dev/v1
+kind: Service
+metadata:
+  name: streamlit-app-2
+  namespace: vps-apps
+spec:
+  template:
+    metadata:
+      annotations:
+        autoscaling.knative.dev/class: "kpa.autoscaling.knative.dev"
+        autoscaling.knative.dev/minScale: "0"
+        autoscaling.knative.dev/maxScale: "3"
+        autoscaling.knative.dev/target: "15"
+        autoscaling.knative.dev/terminationGracePeriodSeconds: "60"
+        autoscaling.knative.dev/scaleDownDelay: "30s"
+        autoscaling.knative.dev/scale-to-zero-pod-retention-period: "1m"
+        autoscaling.knative.dev/metric: "rps"
+    spec:
+      timeoutSeconds: 60
+      containers:
+      - image: 730335200563.dkr.ecr.ap-south-1.amazonaws.com/streamlit-app-2:latest
+        env:
+        - name: APP_SCRIPT_PATH
+          value: "app.py"
+        - name: STREAMLIT_PORT
+          value: "8501"
+        - name: VPS_ENV_TYPE
+          value: "vipas-streamlit"
+        ports:
+        - containerPort: 8501
+        resources:
+          limits:
+            cpu: "1"
+            memory: "1Gi"
+          requests:
+            cpu: "100m"
+            memory: "100Mi"
+
